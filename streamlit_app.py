@@ -26,24 +26,33 @@ type_selection = st.sidebar.multiselect("Sélectionnez le type d'accès", option
 
 filtered_df = df[(df['Ville'].isin(ville_selection)) & (df['Accès'].isin(type_selection))]
 
-# Visualisation 1 : Carte avec st.map
-st.subheader("🗺️ Carte des Défibrillateurs")
-if not filtered_df.empty:
-    map_data = filtered_df[['latitude', 'longitude']].dropna()
-    st.map(map_data)
-else:
-    st.info("Aucun défibrillateur trouvé pour les filtres sélectionnés.")
-    st.map(df[['latitude', 'longitude']].dropna())
+# Organisation en onglets
+onglets = st.tabs(["Carte", "Répartition par ville", "Répartition par type d'accès", "Tableau"])
 
-# Visualisation 2 : Répartition par ville
-st.subheader("📊 Répartition des Défibrillateurs par Ville")
-city_counts = filtered_df['Ville'].value_counts().reset_index()
-city_counts.columns = ['Ville', 'Nombre']
-fig_bar = px.bar(city_counts, x='Ville', y='Nombre', color='Ville', text='Nombre')
-fig_bar.update_traces(textposition='outside')
-st.plotly_chart(fig_bar, use_container_width=True)
+with onglets[0]:
+    st.subheader("🗺️ Carte des Défibrillateurs")
+    if not filtered_df.empty:
+        map_data = filtered_df[['latitude', 'longitude']].dropna()
+        st.map(map_data)
+    else:
+        st.info("Aucun défibrillateur trouvé pour les filtres sélectionnés.")
+        st.map(df[['latitude', 'longitude']].dropna())
 
-# Tableau filtré
-st.subheader("📋 Tableau des Défibrillateurs Filtrés")
-st.dataframe(filtered_df)
+with onglets[1]:
+    st.subheader("📊 Répartition des Défibrillateurs par Ville")
+    city_counts = filtered_df['Ville'].value_counts().reset_index()
+    city_counts.columns = ['Ville', 'Nombre']
+    fig_bar = px.bar(city_counts, x='Ville', y='Nombre', color='Ville', text='Nombre')
+    fig_bar.update_traces(textposition='outside')
+    st.plotly_chart(fig_bar, use_container_width=True)
 
+with onglets[2]:
+    st.subheader("🔑 Répartition par Type d'Accès")
+    type_counts = filtered_df['Accès'].value_counts().reset_index()
+    type_counts.columns = ['Type d\'Accès', 'Nombre']
+    fig_type = px.pie(type_counts, names='Type d\'Accès', values='Nombre', title="Répartition des Défibrillateurs par Type d'Accès")
+    st.plotly_chart(fig_type, use_container_width=True)
+
+with onglets[3]:
+    st.subheader("📋 Tableau des Défibrillateurs Filtrés")
+    st.dataframe(filtered_df)
