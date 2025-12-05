@@ -1,7 +1,0 @@
-[theme]
-backgroundColor = "#ffffff"
-primaryColor = "#4bc0ad"
-secondaryColor = "#004fa3"
-
-[theme.sidebar]
-showWidgetBorder=true
